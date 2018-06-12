@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>TinyApp</title>
+</head>
+
+<body>
+    <ul>
+        <!-- Add your EJS code here -->
+        <% for (key in urls) { %>
+            <li>
+                <%= urls[key] %> - <%= key %> 
+            </li>
+            <% } %>
+        <a> LINK to shorten new URL to be implemented </a>
+    </ul>
+</body>
+
+</html>
