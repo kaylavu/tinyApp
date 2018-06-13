@@ -1,2 +1,21 @@
 <head> 
 </head>
+
+<body>
+        <% if (!locals.username) { %> 
+            <form method="POST" action="/login">
+                USERNAME: <input type="text" name="username"> 
+                <input type="submit" value=login>
+            </form>
+         <% } else { %>
+            <form method="POST" action="/logout">
+                <%= username %>
+                <input type="submit" value="logout">
+            </form>
+            <% } %> 
+       
+
+
+       
+    
+    </body>
