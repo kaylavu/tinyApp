@@ -46,8 +46,25 @@ app.get("/urls/new", (req, res) => {
   });
 
   app.post("/urls", (req, res) => {
-    console.log(req.body);  // debug statement to see POST parameters
-    res.send("Ok");         // Respond with 'Ok' (we will replace this)
+    const shortURL = generateRandomString();     //generate short url
+    urlDatabase[shortURL] = req.body.longURL;    // add to urlDatabase
+    //console.log(urlDatabase);  // 
+    //console.log(req.body, shortURL);  
+    var shortUrl = "/urls/"+shortURL;           // 
+    //console.log(shortUrl);
+    res.redirect(301,shortUrl);         // 
+    //console.log(urlDatabase);
+  });
+
+
+
+  app.get("/u/:shortURL", (req, res) => {
+      //console.log("we are in the /u shorturl")
+      //console.log('REQUEST:', req)
+      //console.log('RES', res )
+    let longURL = urlDatabase[req.params.shortURL];
+    //console.log(longURL);
+    res.redirect(301, longURL);
   });
 
 
