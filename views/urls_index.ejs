@@ -5,15 +5,24 @@
     <title>TinyApp</title>
 </head>
 
+<header>
+    <% include partials/_header %>
+</header>
+
 <body>
     <ul>
         <!-- Add your EJS code here -->
         <% for (key in urls) { %>
             <li>
-                <%= urls[key] %> - <%= key %> 
+                <%= key %> - <%= urls[key] %> 
+
+                        <form method="POST" action="/urls/<%= key %>/delete">
+                            <input type=submit value=delete>
+                        </form>
             </li>
             <% } %>
-        <a> LINK to shorten new URL to be implemented </a>
+                <a href="url">link text</a>
+
     </ul>
 </body>
 
