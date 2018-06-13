@@ -10,9 +10,13 @@
 </header>
 
 <body>
-      Full URL:  <%= longURL %> 
-      Short URL: <%= shortURL %>
+    Short URL: <%= shortURL %>
+    Full URL:  <%= longURL %> 
       
+    <form method="POST" action="/urls/<%= shortURL %>">
+        New LongUrl: <input type=text name="newURL"> 
+        <input type=submit value=update>
+    </form>
 
 </body>
 

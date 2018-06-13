@@ -89,10 +89,18 @@ app.get("/urls/:id", (req, res) => {
     //console.log(typeof req.params.id);
 });
 
-
+// route handler to delete a URL 
 app.post("/urls/:id/delete", (req, res) => {
     //1. delete the url from database 
     delete urlDatabase[req.params.id];
+    //2. redirect user to urls index page 
+   res.redirect("/urls")
+});
+
+// route handler to update a URL 
+app.post("/urls/:id", (req, res) => {
+    //1. modify the corresponding longURL
+    urlDatabase[req.params.id] = req.body.newURL
     //2. redirect user to urls index page 
    res.redirect("/urls")
 });

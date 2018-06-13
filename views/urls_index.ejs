@@ -14,14 +14,15 @@
         <!-- Add your EJS code here -->
         <% for (key in urls) { %>
             <li>
-                <%= key %> - <%= urls[key] %> 
+                <%= key %> -> <%= urls[key] %> 
 
                         <form method="POST" action="/urls/<%= key %>/delete">
+                            <a href="/urls/<%= key %>">EDIT</a>
                             <input type=submit value=delete>
                         </form>
             </li>
             <% } %>
-                <a href="url">link text</a>
+                
 
     </ul>
 </body>
