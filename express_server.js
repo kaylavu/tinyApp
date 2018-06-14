@@ -13,8 +13,8 @@ app.use(bodyParser.urlencoded({
 app.use(cookieParser()); 
 
 const urlDatabase = {
-    "b2xVn2": "http://www.lighthouselabs.ca",
-    "9sm5xK": "http://www.google.com"
+    "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: 'userRandomID'},
+    "9sm5xK": {longURL:"http://www.google.com", userID: 'user2RandomID'} 
 };
 
 const users = { 
@@ -36,6 +36,36 @@ function generateRandomString() {
     return randomString;
 }
 
+function getUserByEmail(email) {
+    for (userId in users) {
+        var user = users[userId];
+        if(user.email === email) {
+            return user;
+        }
+    }
+}
+
+function getUserFromRequest(req) {
+    return getUserById(req.cookies.user_id);
+}
+
+function getUserById(userId) {
+    return users[userId];
+}
+
+function urlsForUser(id)  {
+    const urlForUserDatabase = {};
+    for (url in urlDatabase) {
+        console.log("URL:", url);
+        console.log(urlDatabase[url]['userID']);
+        if (urlDatabase[url]['userID'] === id) {
+            console.log("URL userID:", url.userID ,"ID:", id );
+            urlForUserDatabase[url] = urlDatabase[url];
+        }
+    }
+}
+
+console.log("URL SUBSET FOR USER>>>>>", urlsForUser('userRandomID')); 
 
 app.get("/", (req, res) => {
     res.end("Hello!");
@@ -65,13 +95,22 @@ app.get("/urls", (req, res) => {
 
 // route handler to render form for user input  
 app.get("/urls/new", (req, res) => {
-    res.render("urls_new");
+    let templateVars = {
+        user: getUserFromRequest(req)
+    };
+    if(!getUserFromRequest(req)) {
+        res.redirect("/login")
+    } else {
+        res.render("urls_new",templateVars);
+    }
 });
 
 app.post("/urls", (req, res) => {
     const shortURL = generateRandomString(); //generate short url
-    urlDatabase[shortURL] = req.body.longURL; // add to urlDatabase  //console.log(req.body, shortURL);  
+    urlDatabase[shortURL] = {longURL: req.body.longURL, userID: getUserFromRequest(req).id } // add to urlDatabase  //console.log(req.body, shortURL);  
+    //urlDatabase['userID'] = getUserFromRequest(req)
     var shortUrl = "/urls/" + shortURL; //short url path  //console.log(urlDatabase);
+    //console.log('MY NEW DATABASE:', urlDatabase);
     res.redirect(301, shortUrl);
 });
 
@@ -84,7 +123,7 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-    let longURL = urlDatabase[req.params.id];
+    let longURL = urlDatabase[req.params.id].longURL;
     let templateVars = {
         shortURL: req.params.id,
         longURL: longURL,
@@ -92,16 +131,21 @@ app.get("/urls/:id", (req, res) => {
     };
     res.render("urls_show", templateVars);
     //console.log(urlDatabase);
-    console.log(longURL);
-    //console.log(typeof req.params.id);
+    //console.log(longURL);
+    //console.log('MY FULL URL:', req.params.id);
 });
 
 // route handler to delete a URL
-app.post("/urls/:id/delete", (req, res) => {
-    //1. delete the url from database 
-    delete urlDatabase[req.params.id];
-    //2. redirect user to urls index page 
-   res.redirect("/urls")
+app.post("/urls/:id/delete", (req, res) => { 
+   const urlID = urlDatabase[req.params.id].userID; 
+   const userID = req.cookies.user_id; 
+   if(urlID === userID) {
+       delete urlDatabase[req.params.id];
+       res.redirect("/urls")
+   } else {
+       res.status(404).send("User does not have access to delete this URL"); 
+   }
+   
 });
 
 // route handler to update a URL 
@@ -137,22 +181,7 @@ app.get("/register", (req, res) => {
     res.render("urls_register", templateVars)
 });
 
-function getUserByEmail(email) {
-    for (userId in users) {
-        var user = users[userId];
-        if(user.email === email) {
-            return user;
-        }
-    }
-}
 
-function getUserFromRequest(req) {
-    return getUserById(req.cookies.user_id);
-}
-
-function getUserById(userId) {
-    return users[userId];
-}
 
 app.post("/register", (req, res) => {
     const userID = generateRandomString(); 
@@ -172,7 +201,7 @@ app.post("/register", (req, res) => {
         }
     }
     users[userID] = {id:userID, email:email, password:password} 
-    console.log(users); 
+    //console.log(users); 
     res.cookie('user_id', userID)
     res.redirect("/urls")
 

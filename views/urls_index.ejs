@@ -23,7 +23,7 @@
         <% for (key in urls) { %>
             <tr>
             <td><%= key %> -> </td> 
-            <td><%= urls[key] %></td>
+            <td><%= urls[key].longURL %></td>
             <td><a href="/urls/<%= key %>" >EDIT</a></td>    
             <td>
                     <form method="POST" action="/urls/<%= key %>/delete">
