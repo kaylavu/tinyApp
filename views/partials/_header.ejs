@@ -3,21 +3,33 @@
 <h1> TinyApp </h1>
 </head>
 
-<body>
-        <% if (!locals.username) { %> 
+
+
+ <body>
+
+        <% if (!user) { %>       
+            <a href="/register%>" >REGISTER</a>
+            <a href="/login" >LOGIN</a>
+         <% } else { %>
+            <form method="POST" action="/logout">
+                <%= user.email %>
+                <input type="submit" class="btn btn-primary" value="logout">
+            </form>
+            <% } %>  
+
+    
+</body>
+
+
+<!-- 
+        <% if (!user) { %>       
             <form method="POST" action="/login">
-                USERNAME: <input type="text" name="username"> 
+                USERNAME: <input type="text" name="email"> 
                 <input type="submit" class="btn btn-primary" value=login>
             </form>
          <% } else { %>
             <form method="POST" action="/logout">
-                <%= username %>
+                <%= user.email %>
                 <input type="submit" class="btn btn-primary" value="logout">
             </form>
-            <% } %> 
-       
-
-
-       
-    
-    </body>
+            <% } %>  -->
