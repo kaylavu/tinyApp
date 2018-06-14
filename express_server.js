@@ -131,7 +131,10 @@ app.post("/logout", (req, res) => {
 
 
 app.get("/register", (req, res) => {
-    res.render("urls_register", )
+    let templateVars = {
+        user: getUserFromRequest(req)
+    };
+    res.render("urls_register", templateVars)
 });
 
 function getUserByEmail(email) {
@@ -155,6 +158,7 @@ app.post("/register", (req, res) => {
     const userID = generateRandomString(); 
     const email = req.body.email; 
     const password = req.body.password; 
+    
     if(!email || !password === 0) {
         res.status(400).send('Please enter email and password!');
         return;
