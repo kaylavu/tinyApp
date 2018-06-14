@@ -1,9 +1,8 @@
-var express = require("express");
-var app = express();
-var PORT = 8080; //default port 8080
+const express = require("express");
+const app = express();
 const bodyParser = require("body-parser"); // allows access to POST request parameters 
 const cookieParser = require('cookie-parser'); 
-
+var PORT = 8080; //default port 8080
 
 app.set("view engine", "ejs");
 
@@ -65,8 +64,6 @@ app.post("/urls", (req, res) => {
     res.redirect(301, shortUrl);
 });
 
-
-
 app.get("/u/:shortURL", (req, res) => {
     //console.log('REQUEST:', req)
     //console.log('RES', res )
@@ -75,16 +72,8 @@ app.get("/u/:shortURL", (req, res) => {
     res.redirect(301, longURL);
 });
 
-
-//example of how res.render looks into the second param 
-//res.render("urls_index", {urls: urlDatabase, key2: 'value2', key3: 'value3})
-//res.render("urls_index", var urls = urlDatabse, var key2 = 'value2, var key3 = 'value3') 
-
-// route handler to render the 
 app.get("/urls/:id", (req, res) => {
     let longURL = urlDatabase[req.params.id];
-   
-   
     let templateVars = {
         shortURL: req.params.id,
         longURL: longURL,
@@ -96,7 +85,7 @@ app.get("/urls/:id", (req, res) => {
     //console.log(typeof req.params.id);
 });
 
-// route handler to delete a URL 
+// route handler to delete a URL
 app.post("/urls/:id/delete", (req, res) => {
     //1. delete the url from database 
     delete urlDatabase[req.params.id];
