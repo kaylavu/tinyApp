@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require("body-parser"); // allows access to POST request parameters 
 const cookieParser = require('cookie-parser'); 
 var PORT = 8080; //default port 8080
+const bcrypt = require('bcrypt');
 
 app.set("view engine", "ejs");
 
@@ -174,11 +175,11 @@ app.post("/urls/:id", (req, res) => {
 app.post("/login", (req, res) => {
     const user = getUserByEmail(req.body.email);
     const password = req.body.password 
-    if(user.password === req.body.password) {
+    if(bcrypt.compareSync(password, user.password)) {
         res.cookie('user_id', user.id);
         res.redirect("/urls");
     } 
-    if(user.password !== req.body.password) {
+    if(!bcrypt.compareSync(password, user.password)) {
         res.status(404).send("Incorrect Password");
     }
     // console.log(req.body);
@@ -208,6 +209,7 @@ app.post("/register", (req, res) => {
     const userID = generateRandomString(); 
     const email = req.body.email; 
     const password = req.body.password; 
+    const hashedPassword = bcrypt.hashSync(password, 10);
     
     if(!email || !password === 0) {
         res.status(400).send('Please enter email and password!');
@@ -221,8 +223,8 @@ app.post("/register", (req, res) => {
             return;
         }
     }
-    users[userID] = {id:userID, email:email, password:password} 
-    //console.log(users); 
+    users[userID] = {id:userID, email:email, password:hashedPassword} 
+    console.log(users); 
     res.cookie('user_id', userID)
     res.redirect("/urls")
 
