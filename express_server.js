@@ -1,17 +1,22 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser"); // allows access to POST request parameters 
-const cookieParser = require('cookie-parser'); 
+//const cookieParser = require('cookie-parser'); 
 var PORT = 8080; //default port 8080
 const bcrypt = require('bcrypt');
+var cookieSession = require('cookie-session')
 
 app.set("view engine", "ejs");
+app.use(cookieSession({
+    name: 'session',
+    keys: ['key1', 'key2']
+  }))
 
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-app.use(cookieParser()); 
+//app.use(cookieParser()); 
 
 var urlDatabase = {
     "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: 'userRandomID'},
@@ -47,7 +52,7 @@ function getUserByEmail(email) {
 }
 
 function getUserFromRequest(req) {
-    return getUserById(req.cookies.user_id);
+    return getUserById(req.session.user_id);
 }
 
 function getUserById(userId) {
@@ -89,7 +94,7 @@ app.get("/hello", (req, res) => {
 // route handler to render all the urls on the index page
 app.get("/urls", (req, res) => {
     let templateVars = {
-        urls: urlsForUser(req.cookies.user_id),
+        urls: urlsForUser(req.session.user_id),
         user: getUserFromRequest(req),
        // urlSubset: urlsForUser(getUserFromRequest(req))
     };
@@ -136,7 +141,7 @@ app.get("/urls/:id", (req, res) => {
    
     //check if cookie matches against short urls userid 
     //if matches allow them to edit and update 
-    if(req.cookies.user_id === urlDatabase[req.params.id].userID) {
+    if(req.session.user_id === urlDatabase[req.params.id].userID) {
         res.render("urls_show", templateVars);
     } else {
         res.status(403).send("Unauthorized Access")
@@ -147,7 +152,7 @@ app.get("/urls/:id", (req, res) => {
 // route handler to delete a URL
 app.post("/urls/:id/delete", (req, res) => { 
    const urlID = urlDatabase[req.params.id].userID; 
-   const userID = req.cookies.user_id; 
+   const userID = req.session.user_id; 
    if(urlID === userID) {
        delete urlDatabase[req.params.id];
        res.redirect("/urls")
@@ -163,7 +168,7 @@ app.post("/urls/:id", (req, res) => {
     urlDatabase[req.params.id] = {
         longURL: req.body.newURL,
         shortURL: req.params.id,
-        userID: req.cookies.user_id
+        userID: req.session.user_id
     }
     
     
@@ -176,7 +181,8 @@ app.post("/login", (req, res) => {
     const user = getUserByEmail(req.body.email);
     const password = req.body.password 
     if(bcrypt.compareSync(password, user.password)) {
-        res.cookie('user_id', user.id);
+        //req.cookie('user_id', user.id);
+        req.session.user_id = user.id 
         res.redirect("/urls");
     } 
     if(!bcrypt.compareSync(password, user.password)) {
@@ -191,7 +197,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-    res.clearCookie('user_id');
+    req.session = null;
     res.redirect("/urls");
 });
 
@@ -225,7 +231,8 @@ app.post("/register", (req, res) => {
     }
     users[userID] = {id:userID, email:email, password:hashedPassword} 
     console.log(users); 
-    res.cookie('user_id', userID)
+    //res.cookie('user_id', userID)
+    req.session.user_id = userID
     res.redirect("/urls")
 
 });
