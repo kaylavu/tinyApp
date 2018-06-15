@@ -12,21 +12,21 @@ app.use(bodyParser.urlencoded({
 
 app.use(cookieParser()); 
 
-const urlDatabase = {
+var urlDatabase = {
     "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: 'userRandomID'},
     "9sm5xK": {longURL:"http://www.google.com", userID: 'user2RandomID'} 
 };
 
-const users = { 
+var users = { 
     "userRandomID": {
       id: "userRandomID",
       email: "user@example.com",
-      password: "purple-monkey-dinosaur"
+      password: "pass1"
     },
    "user2RandomID": {
       id: "user2RandomID",
       email: "user2@example.com",
-      password: "dishwasher-funk"
+      password: "pass2"
     }
   }
 
@@ -56,16 +56,17 @@ function getUserById(userId) {
 function urlsForUser(id)  {
     const urlForUserDatabase = {};
     for (url in urlDatabase) {
-        console.log("URL:", url);
-        console.log(urlDatabase[url]['userID']);
-        if (urlDatabase[url]['userID'] === id) {
-            console.log("URL userID:", url.userID ,"ID:", id );
-            urlForUserDatabase[url] = urlDatabase[url];
+        //console.log("url", url);
+        //console.log("URL's userId:", urlDatabase[url]['userID']);
+        if (urlDatabase[url]['userID'] === id) {        
+            //console.log(urlDatabase[url]);  //url object 
+            urlForUserDatabase[url] = urlDatabase[url];  //add url object to url subset
+            //console.log("URL SUBSET>>", urlForUserDatabase);
         }
     }
+    return urlForUserDatabase;
 }
 
-console.log("URL SUBSET FOR USER>>>>>", urlsForUser('userRandomID')); 
 
 app.get("/", (req, res) => {
     res.end("Hello!");
@@ -87,8 +88,9 @@ app.get("/hello", (req, res) => {
 // route handler to render all the urls on the index page
 app.get("/urls", (req, res) => {
     let templateVars = {
-        urls: urlDatabase,
-        user: getUserFromRequest(req)
+        urls: urlsForUser(req.cookies.user_id),
+        user: getUserFromRequest(req),
+       // urlSubset: urlsForUser(getUserFromRequest(req))
     };
     res.render("urls_index", templateVars);
 });
@@ -115,9 +117,10 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-    //console.log('REQUEST:', req)
+    console.log('REQUEST:', req.params, urlDatabase[req.params.shortURL]);
     //console.log('RES', res )
-    let longURL = urlDatabase[req.params.shortURL];
+    //console.log(req.params.shortURL);
+    let longURL = urlDatabase[req.params.shortURL].longURL; 
     //console.log(longURL);
     res.redirect(301, longURL);
 });
@@ -129,10 +132,15 @@ app.get("/urls/:id", (req, res) => {
         longURL: longURL,
         user: getUserFromRequest(req)
     };
-    res.render("urls_show", templateVars);
-    //console.log(urlDatabase);
-    //console.log(longURL);
-    //console.log('MY FULL URL:', req.params.id);
+   
+    //check if cookie matches against short urls userid 
+    //if matches allow them to edit and update 
+    if(req.cookies.user_id === urlDatabase[req.params.id].userID) {
+        res.render("urls_show", templateVars);
+    } else {
+        res.status(403).send("Unauthorized Access")
+    }
+  
 });
 
 // route handler to delete a URL
@@ -151,7 +159,13 @@ app.post("/urls/:id/delete", (req, res) => {
 // route handler to update a URL 
 app.post("/urls/:id", (req, res) => {
     //1. modify the corresponding longURL
-    urlDatabase[req.params.id] = req.body.newURL
+    urlDatabase[req.params.id] = {
+        longURL: req.body.newURL,
+        shortURL: req.params.id,
+        userID: req.cookies.user_id
+    }
+    
+    
     //2. redirect user to urls index page 
    res.redirect("/urls")
 });
@@ -159,13 +173,20 @@ app.post("/urls/:id", (req, res) => {
 // route handler to login 
 app.post("/login", (req, res) => {
     const user = getUserByEmail(req.body.email);
+    const password = req.body.password 
+    if(user.password === req.body.password) {
+        res.cookie('user_id', user.id);
+        res.redirect("/urls");
+    } 
+    if(user.password !== req.body.password) {
+        res.status(404).send("Incorrect Password");
+    }
     // console.log(req.body);
     if(user === undefined) {
         res.status(403).send("User does not exist");
         return; 
     }
-    res.cookie('user_id', user.id);
-    res.redirect("/urls");
+    
 });
 
 app.post("/logout", (req, res) => {

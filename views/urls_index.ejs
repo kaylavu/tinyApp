@@ -14,6 +14,12 @@
 <body>
     <br> 
     <br>
+
+        <% if (!user) {%>
+            Please login or register first. 
+        <% } else { %>
+
+
     <table>
         <tr>
             <th>shortURL</th>
@@ -35,6 +41,7 @@
             <% } %>
 
     </table>
+    <% } %>
     <ul>
         
 
