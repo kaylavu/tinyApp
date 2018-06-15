@@ -18,32 +18,30 @@
         <% if (!user) {%>
             Please login or register first. 
         <% } else { %>
-            <a href="/urls/new" > CREATE NEW </a>
+            <a href="/urls/new" > CREATE NEW + </a>
             <br> 
             <br>
             <br>
-            <br> 
-    <table> 
-        <tr>
-            <th>shortURL</th>
-            <th>longURL</th>
-        </tr>
-        
+        <h3> My List of URLS</h3>
+    
+        <table class="table" > 
+       
         <% for (key in urls) { %>
             <tr>
-            <td><%= key %> -> </td> 
+            <td><%= key %></td> 
             <td><%= urls[key].longURL %></td>
-            <td><a href="/urls/<%= key %>" >EDIT</a></td>    
+            <td><a href="/urls/<%= key %>" >EDIT</a> </td>   
             <td>
-                    <form method="POST" action="/urls/<%= key %>/delete">
-                        <input type=submit value=DELETE>
-                    </form>
+                <form method="POST" action="/urls/<%= key %>/delete">
+                    <input type=submit value=DELETE>
+                </form>
             </td>
                         
             </tr>
             <% } %>
 
     </table>
+
     <% } %>
     <ul>
         
@@ -52,3 +50,4 @@
 </body>
 
 </html>
+
