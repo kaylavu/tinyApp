@@ -217,7 +217,7 @@ app.post("/register", (req, res) => {
     const password = req.body.password; 
     const hashedPassword = bcrypt.hashSync(password, 10);
     
-    if(!email || !password === 0) {
+    if(!email || !password) {
         res.status(400).send('Please enter email and password!');
         return;
     }
@@ -230,7 +230,7 @@ app.post("/register", (req, res) => {
         }
     }
     users[userID] = {id:userID, email:email, password:hashedPassword} 
-    console.log(users); 
+    //console.log(users); 
     //res.cookie('user_id', userID)
     req.session.user_id = userID
     res.redirect("/urls")
