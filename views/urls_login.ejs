@@ -4,11 +4,15 @@
     </head>
     
     <body>
-            <% if (!user) { %>       
+            <% if (!user) { %>    
+                <a href="/register" > REGISTER</a>  
+                <a href="/login" > LOGIN</a>   
+                <br>
+                <br>
                 <form method="POST" action="/login">
                     EMAIL: <input type="text" name="email"> 
                     PASSWORD: <input type="password" name="password">
-                    <input type="submit" class="btn btn-primary" value=login>
+                    <input type="submit" class="btn btn-primary" value=LOGIN>
                 </form>
              <% } %>
              

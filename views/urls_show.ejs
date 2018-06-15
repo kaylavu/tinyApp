@@ -10,13 +10,16 @@
 <header>
     <% include partials/_header %>
 </header>
-
+<br>
+<br>
 <body>
-    Short URL: <%= shortURL %>
-    Full URL:  <%= longURL %> 
-      
-    <form method="POST" action="/urls/<%= shortURL %>">
-        New LongUrl: <input type=text name="newURL"> 
+    <strong>Short URL:</strong> <%= shortURL %> 
+    <br>
+    <strong>Full URL:</strong>  <%= longURL %> 
+     <br> 
+     <br>
+    <form method="POST" action="/urls/<%= shortURL %>"> 
+        New LongURL: <input type=text name="newURL"> 
         <input type=submit value=update>
     </form>
 
