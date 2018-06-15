@@ -179,9 +179,12 @@ app.post("/urls/:id", (req, res) => {
 // route handler to login 
 app.post("/login", (req, res) => {
     const user = getUserByEmail(req.body.email);
+    if(user === undefined) {
+        res.status(403).send("User does not exist.Please register.");
+        return; 
+    }
     const password = req.body.password 
     if(bcrypt.compareSync(password, user.password)) {
-        //req.cookie('user_id', user.id);
         req.session.user_id = user.id 
         res.redirect("/urls");
     } 
@@ -189,10 +192,7 @@ app.post("/login", (req, res) => {
         res.status(404).send("Incorrect Password");
     }
     // console.log(req.body);
-    if(user === undefined) {
-        res.status(403).send("User does not exist");
-        return; 
-    }
+    
     
 });
 
